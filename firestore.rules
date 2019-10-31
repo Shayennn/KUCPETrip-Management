@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+  
+  	function IsAdmin() {
+      return get(/databases/$(database)/documents/people/$(request.auth.token.email)).data.IsAdmin;
+    }
+  
+  	function notAllowSomeFields(){
+    	return resource.data.IsAdmin == request.resource.data.IsAdmin && resource.data.IsPaid == request.resource.data.IsPaid && resource.data.StudentID == request.resource.data.StudentID;
+    }
+  
+    match /people/{people} {
+      allow list: if exists(/databases/$(database)/documents/people/$(request.auth.token.email));
+    	allow create: if IsAdmin();
+      allow read: if request.auth.token.email == people || IsAdmin();
+      allow update: if notAllowSomeFields() && (request.auth.token.email == people || IsAdmin());
+    }
+    match /payments/{payment} {
+      // allow read, list: if true;
+    	allow list: if IsAdmin() || /databases/$(database)/documents/people/$(request.auth.token.email) == resource.data.user;
+      allow read: if IsAdmin() || /databases/$(database)/documents/people/$(request.auth.token.email) == resource.data.user;
+    }
+  }
+}

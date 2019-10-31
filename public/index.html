@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  <script src="https://kit.fontawesome.com/96bbb8b705.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
+  <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
+
+  <title>Hello, CPE32!</title>
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-md navbar-light bg-light shadow-sm">
+    <a class="navbar-brand" href="/">KUCPE32</a>
+    <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#mainnav"
+      aria-controls="mainnav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="mainnav">
+      <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+        <li class="nav-item active">
+          <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+        </li>
+      </ul>
+      <div class="navbar-brand my-2 my-lg-0">
+        <img width="40" height="40" class="d-inline-block align-top rounded-circle" id="user_pic">
+        <span id="user_dn"></span>
+        <button id="logout_btn" class="btn btn-outline-danger my-2 my-sm-0">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container text-center" id="loading">
+    <div class="container" style="padding-top: 20em;">
+      <h1 class="display-1"><i class="fas fa-spin fa-spinner    "></i> Loading...</h1>
+    </div>
+  </div>
+
+  <div id="main_content" class="container pt-5" style="display: none;">
+
+    <h1>Your trip.</h1>
+    <hr />
+    <div class="row">
+      <div class="col-3 text-right">
+        <strong>ผู้เข้าร่วม</strong>
+      </div>
+      <div class="col"><span id="db_Count">...</span> (ชำระเงินแล้ว <span id="db_ConfirmCount">...</span>)</div>
+    </div>
+    <div class="row">
+      <div class="col-3 text-right">
+        <strong>Duration</strong>
+      </div>
+      <div class="col">Feb 8, 2020 - Feb 10, 2020</div>
+    </div>
+    <div class="row">
+      <div class="col-3 text-right">
+        <strong>At</strong>
+      </div>
+      <div class="col">Chanthaburi</div>
+    </div>
+    <div class="row">
+      <div class="col-3 text-right">
+        <strong>StudentID</strong>
+      </div>
+      <div class="col" id="db_StudentID"></div>
+    </div>
+    <div class="row">
+      <div class="col-3 text-right">
+        <strong>Telephone</strong>
+      </div>
+      <div class="col" id="db_Telephone"></div>
+    </div>
+    <div class="row">
+      <div class="col-3 text-right">
+        <strong>Join ?</strong>
+      </div>
+      <div class="col" id="db_IsJoin"></div>
+    </div>
+    <div class="row">
+      <div class="col-3 text-right">
+        <strong title="สถานะจะเปลี่ยนเมื่อชำระเงินครบ">Confirmed ?</strong>
+      </div>
+      <div class="col" id="db_IsPaid"></div>
+    </div>
+    <div class="row">
+      <div class="col-3 text-right">
+        <strong>Allergy</strong>
+      </div>
+      <div class="col" id="db_Allergy"></div>
+    </div>
+    <div class="row pt-4 justify-content-center">
+      <div class="col offset-md-3">
+        <a href="edit.html" name="editBtn" id="editBtn" class="btn btn-warning" btn-lg btn-block">แก้ไขข้อมูล</a>
+        <button style="display: none;" type="button" name="joinBtn" id="joinBtn" class="btn btn-info" btn-lg btn-block"
+          title="กรุณาทราบว่าเมื่อชำระเงินเพื่อยืนยันการลงทะเบียนแล้ว จะไม่สามารถยกเลิกการเข้าร่วมได้">Join</button>
+        <button style="display: none;" type="button" name="cancelBtn" id="cancelBtn" class="btn btn-danger" btn-lg btn-block">Unjoin</button>
+      </div>
+    </div>
+    <hr />
+    <h3 class="pt-3">Payment history</h3>
+    <div class="alert alert-info" role="alert">
+      <h4 class="alert-heading"><i class="fas fa-info-circle"></i> ช่องทางการชำระเงิน</h4>
+      <p></p>
+      <p class="mb-0">
+        ยอดชำระคนละ 600 บาท ชำระได้ถึงวันที่ 30 พฤศจิกายน 2562
+        <ul>
+          <li>ธนาคารไทยพาณิชย์ (SCB) 2352819270</li>
+          <li>ชื่อบัญชี นาย พิชวัชร ลัคนาธิติ</li>
+        </ul>
+      </p>
+      <p><strong>คนละบัญชีกับเงินภาค</strong></p>
+      <p><strong>เมื่อชำระเงินครบแล้ว จะถือว่าได้ทำการยืนยันการลงทะเบียนเรียบร้อยแล้ว และการลงทะเบียนนี้ไม่สามารถยกเลิก/คืนเงินได้</strong></p>      
+      <p>หากภายใน 1 ชั่วโมงหลังโอนเงินเข้ามา ระบบยังไม่อัพเดทข้อมูลให้แจ้งโอนเงินได้ที่กอล์ฟ</p>
+    </div>
+    <div id="noPayment" class="alert alert-warning" role="alert">
+      <strong><i class="fas fa-exclamation"></i> ยังไม่พบข้อมูลการชำระเงิน.</strong>
+    </div>
+    <div id="paymentTable" style="display: none;" class="table-responsive">
+      <table class="table table-hover">
+        <thead class="thead-default">
+          <tr>
+            <th>TXID</th>
+            <th>Amount</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody id="table_data">
+        </tbody>
+      </table>
+    </div>
+    <hr />
+    <h3 class="pt-3">รายนามผู้เข้าร่วม</h3>
+    <div id="noPeople" class="alert alert-warning" role="alert">
+      <strong><i class="fas fa-exclamation"></i> No one.</strong>
+    </div>
+    <div id="peopleTable" style="display: none;" class="table-responsive pt-3">
+      <table class="table table-hover">
+        <thead class="thead-default">
+          <tr>
+            <th>StudentID</th>
+            <th>Name</th>
+            <th>ชำระเงินแล้ว</th>
+          </tr>
+        </thead>
+        <tbody id="people_data">
+        </tbody>
+      </table>
+    </div>
+    <hr class="mt-5" />
+    <p class="pt-2 pb-5 text-center">Dev by Phitchawat L. All right reserved.</p>
+  </div>
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+  </script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+  </script>
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script src="/__/firebase/7.2.2/firebase-app.js"></script>
+
+  <script src="/__/firebase/7.2.2/firebase-analytics.js"></script>
+
+  <script src="/__/firebase/7.2.2/firebase-auth.js"></script>
+  <script src="/__/firebase/7.2.2/firebase-firestore.js"></script>
+
+  <!-- Initialize Firebase -->
+  <script src="/__/firebase/init.js"></script>
+
+  <script src="/js/init.js"></script>
+  <script src="/js/main.js"></script>
+
+</body>
+
+</html>
