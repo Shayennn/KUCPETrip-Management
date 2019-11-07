@@ -17,12 +17,12 @@ function updateIsPaid(snap, context) {
   db.collection('configs').doc('/payment').get().then(configLoader=>{
     paymentConfig = configLoader.data()
     const newValue = snap.data();
-    console.log(newValue.user.path);
     db.collection('payments').where("user", "==", db.doc(newValue.user.path)).get().then(res => {
       let total = 0;
       res.docs.forEach(i => {
         total += i.data().amount
       })
+      console.log(newValue.user.path+':P'+newValue.amount+':T'+total+':M'+paymentConfig.minpay);
       if (total >= paymentConfig.minpay) {
         db.doc(newValue.user.path).update({
           IsPaid: true,
@@ -33,9 +33,9 @@ function updateIsPaid(snap, context) {
           IsPaid: false
         })
       }
+      return 'Processed '+newValue.user.path;
     })
   })
-  return 'Processed '+newValue.user.path;
 }
 
 exports.paymentMonCreate = functions.firestore
