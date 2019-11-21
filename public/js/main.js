@@ -125,6 +125,11 @@ async function showPeople(res) {
         document.getElementById("noPeople").style.display = 'none';
         document.getElementById("peopleTable").style.display = '';
     }
+    if (user_data.IsAdmin) {
+        let morehead = document.createElement("th")
+        morehead.innerText = 'Action'
+        document.getElementById('people_head').append(morehead)
+    }
     let table = document.getElementById('people_data');
     table.innerHTML=''
     res.docs.sort(compare).forEach(row => {
@@ -145,9 +150,21 @@ async function showPeople(res) {
         Http.onreadystatechange = (e) => {
             name.innerText = Http.responseText
         }
+        //console.log(user_data.IsAdmin)
         tr.appendChild(studentid)
         tr.appendChild(name)
         tr.appendChild(IsPaid)
+        if (user_data.IsAdmin && !row_data.IsPaid) {
+            //console.log('enable pay btn')
+            let action = document.createElement("td")
+            let btnPaid = document.createElement("button")
+            btnPaid.classList = 'btn btn-primary'
+            btnPaid.onclick = togglePaid
+            btnPaid.innerText = 'ชำระเงิน'
+            btnPaid.setAttribute('email', row.id)
+            action.append(btnPaid)
+            tr.append(action)
+        }
         table.appendChild(tr)
     })
 }
@@ -156,6 +173,24 @@ function toggleJoin(){
     loadingPage()
     people.doc(firebase.auth().currentUser.email).update({
         IsJoin: !user_data.IsJoin
+    }).then(loadDB).then(showPage)
+    .catch(function(error) {
+        alert("DB Error: ", error);
+        console.error("DB Error: ", error);
+    });
+}
+
+function togglePaid(e){
+    loadingPage()
+    const t = new Date();
+    console.log(e)
+    payments.doc('CASH@'+t.toLocaleString('th-TH', {
+        timeZone: "Asia/Bangkok"
+    }).replace(/\/|:/g,'-').replace(/\s/,'_')).set({
+        amount: parseFloat(600),
+        time: firebase.firestore.Timestamp.fromMillis(t.getTime()),
+        user: db.collection('people').doc(e.target.getAttribute('email')),
+        admin: people.doc(firebase.auth().currentUser.email)
     }).then(loadDB).then(showPage)
     .catch(function(error) {
         alert("DB Error: ", error);
