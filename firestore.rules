@@ -20,6 +20,7 @@ service cloud.firestore {
       // allow read, list: if true;
     	allow list: if IsAdmin() || /databases/$(database)/documents/people/$(request.auth.token.email) == resource.data.user;
       allow read: if IsAdmin() || /databases/$(database)/documents/people/$(request.auth.token.email) == resource.data.user;
+      allow write: if IsAdmin();
     }
   }
 }
