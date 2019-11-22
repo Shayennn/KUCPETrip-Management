@@ -125,11 +125,6 @@ async function showPeople(res) {
         document.getElementById("noPeople").style.display = 'none';
         document.getElementById("peopleTable").style.display = '';
     }
-    if (user_data.IsAdmin) {
-        let morehead = document.createElement("th")
-        morehead.innerText = 'Action'
-        document.getElementById('people_head').append(morehead)
-    }
     let table = document.getElementById('people_data');
     table.innerHTML=''
     res.docs.sort(compare).forEach(row => {
@@ -154,17 +149,17 @@ async function showPeople(res) {
         tr.appendChild(studentid)
         tr.appendChild(name)
         tr.appendChild(IsPaid)
+        let action = document.createElement("td")
         if (user_data.IsAdmin && !row_data.IsPaid) {
             //console.log('enable pay btn')
-            let action = document.createElement("td")
             let btnPaid = document.createElement("button")
             btnPaid.classList = 'btn btn-primary'
             btnPaid.onclick = togglePaid
             btnPaid.innerText = 'ชำระเงิน'
             btnPaid.setAttribute('email', row.id)
             action.append(btnPaid)
-            tr.append(action)
         }
+        tr.append(action)
         table.appendChild(tr)
     })
 }
@@ -191,6 +186,8 @@ function togglePaid(e){
         time: firebase.firestore.Timestamp.fromMillis(t.getTime()),
         user: db.collection('people').doc(e.target.getAttribute('email')),
         admin: people.doc(firebase.auth().currentUser.email)
+    }).then(()=>{
+        e.target.remove()
     }).then(loadDB).then(showPage)
     .catch(function(error) {
         alert("DB Error: ", error);
